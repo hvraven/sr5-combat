@@ -32,7 +32,7 @@ inline
 void
 basic_menu<T>::move_cursor(int dir)
 {
-  menu_driver(men.get(), dir);
+  check_for_menu_error(menu_driver(men.get(), dir));
   wrefresh(win);
 }
 
@@ -62,7 +62,7 @@ basic_menu<T>::post()
   if (! pointers_valid)
     update_entries();
 
-  post_menu(men.get());
+  check_for_menu_error(post_menu(men.get()));
   posted = true;
   wrefresh(win);
 };
@@ -88,9 +88,9 @@ basic_menu<T>::refresh()
 
   if (! pointers_valid)
     {
-      unpost_menu(men.get());
+      check_for_menu_error(unpost_menu(men.get()));
       update_entries();
-      post_menu(men.get());
+      check_for_menu_error(post_menu(men.get()));
     }
 
   wrefresh(win);
@@ -106,8 +106,8 @@ basic_menu<T>::update_entries()
     [](item_type& c) { return c.ptr.get(); });
   nentries_p.push_back(nullptr);
   std::swap(nentries_p, entries_p);
-  set_menu_items(men.get(), entries_p.data());
-  set_menu_format(men.get(), rows, cols);
+  check_for_menu_error(set_menu_items(men.get(), entries_p.data()));
+  check_for_menu_error(set_menu_format(men.get(), rows, cols));
 
   pointers_valid = true;
 }
