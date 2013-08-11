@@ -1,6 +1,7 @@
 #ifndef SHADOWRUN5_COMBAT_ERROR_HPP
 #define SHADOWRUN5_COMBAT_ERROR_HPP
 
+#include <initializer_list>
 #include <system_error>
 #include <menu.h>
 
@@ -42,6 +43,7 @@ std::error_condition make_error_condition(menu_error e);
 std::error_code make_error_code(menu_error e);
 
 void check_for_menu_error(int ev);
+void check_for_menu_error(int ev, std::initializer_list<menu_error> exclude);
 
 // enable conversion constructor
 namespace std

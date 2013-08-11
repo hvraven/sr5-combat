@@ -32,7 +32,8 @@ inline
 void
 basic_menu<T>::move_cursor(int dir)
 {
-  check_for_menu_error(menu_driver(men.get(), dir));
+  check_for_menu_error(menu_driver(men.get(), dir),
+                       {menu_error::request_denied});
   win->refresh();
 }
 

@@ -81,3 +81,15 @@ check_for_menu_error(int e)
   if (e != E_OK)
     throw std::system_error(e, menu_category());
 }
+
+void
+check_for_menu_error(int ev, std::initializer_list<menu_error> exclude)
+{
+  if (ev != E_OK)
+    {
+      for (const auto& ex : exclude)
+        if (static_cast<menu_error>(ev) == ex)
+          return;
+      throw std::system_error(ev, menu_category());
+    }
+}
