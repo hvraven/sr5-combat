@@ -2,10 +2,10 @@
 
 template<class T>
 basic_menu<T>::basic_menu()
-  : men{new_menu(nullptr), &free_menu},
-    win{nullptr},
+  : win{nullptr},
     entries{},
     entries_p{},
+    men{new_menu(nullptr), &free_menu},
     pointers_valid{false},
     posted{false}
 {

@@ -94,10 +94,10 @@ public:
   MENU* get_ptr() { return men.get(); }
 
 private:
-  menu_ptr men;
   WINDOW* win;
   std::list<item_type> entries;
   std::vector<ITEM*> entries_p;
+  menu_ptr men;
   bool pointers_valid;
   bool posted;
 
