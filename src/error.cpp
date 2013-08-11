@@ -22,21 +22,21 @@ menu_category_impl::message(int ev) const
     case menu_error::connected:
       return "missing translation";
     case menu_error::bad_state:
-      return "missing translation";
+      return "Routine was called from an initilization or termination function.";
     case menu_error::no_room:
-      return "missing translation";
+      return "Menu is too large for its window.";
     case menu_error::not_posted:
-      return "missing translation";
+      return "The menu has not been posted.";
     case menu_error::unknown_command:
-      return "missing translation";
+      return "The menu driver saw an unknown request code.";
     case menu_error::no_match:
-      return "missing translation";
+      return "Character failed to match.";
     case menu_error::not_selectable:
       return "missing translation";
     case menu_error::not_connected:
       return "No items are connected to the menu.";
     case menu_error::request_denied:
-      return "missing translation";
+      return "The menu driver could not process the request.";
     case menu_error::invalid_field:
       return "missing translation";
     case menu_error::current:
