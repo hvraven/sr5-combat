@@ -47,9 +47,11 @@ basic_menu<T>::add_to_window(basic_window& w)
   const auto width = wsize.cols - borders.right - borders.left;
   const auto height = wsize.lines - borders.top - borders.bottom;
   check_for_menu_error(set_menu_win(men.get(), win->ptr()));
-  check_for_menu_error(set_menu_sub(men.get(),
-                                    derwin(win->ptr(), width, height,
-                                           borders.top, borders.left)));
+  auto swin = derwin(win->ptr(), height, width,
+                     borders.top, borders.left);
+  if (swin == nullptr)
+    throw curses_error{"derwin for menu failed"};
+  check_for_menu_error(set_menu_sub(men.get(), swin));
   rows = height;
 }
 
