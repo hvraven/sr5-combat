@@ -41,10 +41,8 @@ interface::interface()
 
   init_pair(1, COLOR_RED, COLOR_BLACK);
 
-  win = title_window{0,0,0,0};
+  win = title_window{LINES - 1,0,0,0,"Testmenü"};
   win.keypad(true);
-  win.set_title("My Menu");
-
 
   m.add_entry("test1", "Testeintrag 1");
   m.add_entry("test2", "Testeintrag 2");
@@ -55,8 +53,8 @@ interface::interface()
   m.add_entry("test7", "Testeintrag 7");
   m.add_entry("test8", "Testeintrag 8");
 
-  m.add_to_window(win);
   m.set_menu_mark(" * ");
+  m.add_to_window(win);
   m.post();
 
   win.draw_decoration();
