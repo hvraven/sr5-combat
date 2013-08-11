@@ -2,8 +2,7 @@
 
 #include "error.hpp"
 
-template <class D>
-crtp_window<D>::crtp_window(int nlines, int ncols, int y, int x)
+basic_window::basic_window(int nlines, int ncols, int y, int x)
   : win{newwin(nlines, ncols, y, x), &delwin},
     lines{nlines},
     cols{ncols},
@@ -16,17 +15,15 @@ crtp_window<D>::crtp_window(int nlines, int ncols, int y, int x)
     cols = COLS - startx;
 }
 
-template <class D>
 void
-crtp_window<D>::refresh()
+basic_window::refresh()
 {
   draw_decoration();
   wrefresh(win.get());
 }
 
-template <class D>
 void
-crtp_window<D>::resize(int l, int c)
+basic_window::resize(int l, int c)
 {
   lines = l;
   cols = c;
@@ -34,21 +31,20 @@ crtp_window<D>::resize(int l, int c)
     throw curses_error{"wresize failed"};
 }
 
-template <class D>
 void
-crtp_window<D>::keypad(bool b)
+basic_window::keypad(bool b)
 {
   ::keypad(win.get(), b);
 }
 
 void
-bordered_window::draw_implementation()
+bordered_window::draw_decoration()
 {
   box(win.get(), 0, 0);
 };
 
 void
-title_window::draw_implementation()
+title_window::draw_decoration()
 {
   box(win.get(), 0, 0);
   mvwprintw(win.get(), 1, 2, title.data());
@@ -56,7 +52,3 @@ title_window::draw_implementation()
   mvwhline(win.get(), 2, 1, ACS_HLINE, cols - 2);
   mvwaddch(win.get(), 2, cols - 1, ACS_RTEE);
 };
-
-template class crtp_window<window>;
-template class crtp_window<bordered_window>;
-template class crtp_window<title_window>;

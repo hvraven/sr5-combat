@@ -21,17 +21,16 @@ struct border_width
   int right;
 };
 
-template <class Derived>
-class crtp_window
+class basic_window
 {
   using win_ptr = std::unique_ptr<WINDOW, decltype(&delwin)>;
 public:
-  crtp_window()
+  basic_window()
     : win{nullptr, &delwin}, lines{0}, cols{0}, starty{0}, startx{0} {}
-  crtp_window(int lines, int cols, int begin_y, int begin_x);
-  explicit crtp_window(WINDOW* w);
-  crtp_window(crtp_window&&) = default;
-  crtp_window& operator=(crtp_window&&) = default;
+  basic_window(int lines, int cols, int begin_y, int begin_x);
+  explicit basic_window(WINDOW* w);
+  basic_window(basic_window&&) = default;
+  basic_window& operator=(basic_window&&) = default;
 
   WINDOW* ptr() { return win.get(); }
   explicit operator WINDOW*() { return win.get(); }
@@ -41,10 +40,8 @@ public:
 
   void refresh();
 
-  void draw_decoration()
-    { static_cast<Derived*>(this)->draw_implementation(); }
-  border_width get_border_width() const
-    { return static_cast<const Derived*>(this)->get_border_width_impl(); }
+  virtual void draw_decoration() = 0;
+  virtual border_width get_border_width() const = 0;
   window_size get_window_size() const
     { return {lines, cols, starty, startx}; }
 
@@ -56,35 +53,35 @@ protected:
   int startx;
 };
 
-class window : public crtp_window<window>
+class window : public basic_window
 {
 public:
-  using crtp_window::crtp_window;
-  void draw_implementation() {}
-  border_width get_border_width_impl() const
+  using basic_window::basic_window;
+  void draw_decoration() override {}
+  border_width get_border_width() const override
     { return {0,0,0,0}; }
 };
 
-class bordered_window : public crtp_window<bordered_window>
+class bordered_window : public basic_window
 {
 public:
-  using crtp_window::crtp_window;
-  void draw_implementation();
-  border_width get_border_width_impl() const
+  using basic_window::basic_window;
+  void draw_decoration() override;
+  border_width get_border_width() const override
     { return {1,1,1,1}; }
 };
 
-class title_window : public crtp_window<title_window>
+class title_window : public basic_window
 {
 public:
   title_window() = default;
   title_window(int lines, int cols, int begin_y, int begin_x,
                std::string t)
-    : crtp_window{lines, cols, begin_y, begin_x},
+    : basic_window{lines, cols, begin_y, begin_x},
       title{std::move(t)} {}
-  using crtp_window::crtp_window;
-  void draw_implementation();
-  border_width get_border_width_impl() const
+  using basic_window::basic_window;
+  void draw_decoration() override;
+  border_width get_border_width() const override
     { return {3,1,1,1}; }
 
   void set_title(std::string t) { title = std::move(t); }

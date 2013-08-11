@@ -33,23 +33,22 @@ void
 basic_menu<T>::move_cursor(int dir)
 {
   check_for_menu_error(menu_driver(men.get(), dir));
-  wrefresh(win);
+  win->refresh();
 }
 
 template <class T>
-template <class W>
 void
-basic_menu<T>::add_to_window(W& w)
+basic_menu<T>::add_to_window(basic_window& w)
 {
-  win = w.ptr();
+  win = &w;
   const auto borders = w.get_border_width();
   const auto wsize = w.get_window_size();
   const auto width = wsize.cols - borders.right - borders.left;
   const auto height = wsize.lines - borders.top - borders.bottom;
-  check_for_menu_error(set_menu_win(men.get(), win));
-  check_for_menu_error(set_menu_sub(men.get(), derwin(win, width, height,
-                                                      borders.top,
-                                                      borders.left)));
+  check_for_menu_error(set_menu_win(men.get(), win->ptr()));
+  check_for_menu_error(set_menu_sub(men.get(),
+                                    derwin(win->ptr(), width, height,
+                                           borders.top, borders.left)));
   rows = height;
 }
 
@@ -64,7 +63,7 @@ basic_menu<T>::post()
 
   check_for_menu_error(post_menu(men.get()));
   posted = true;
-  wrefresh(win);
+  win->refresh();
 };
 
 template<class T>
@@ -93,7 +92,7 @@ basic_menu<T>::refresh()
       check_for_menu_error(post_menu(men.get()));
     }
 
-  wrefresh(win);
+  win->refresh();
 };
 
 template<class T>

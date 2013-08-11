@@ -78,8 +78,7 @@ public:
   void move_cursor(int dir);
   void post();
   void unpost();
-  template <class W>
-  void add_to_window(W& win);
+  void add_to_window(basic_window& win);
   void add_entry(std::string&& name, std::string&& description);
   void refresh();
   void set_size(int rows, int cols);
@@ -94,7 +93,7 @@ public:
   MENU* get_ptr() { return men.get(); }
 
 private:
-  WINDOW* win;
+  basic_window* win;
   std::list<item_type> entries;
   std::vector<ITEM*> entries_p;
   menu_ptr men;
