@@ -77,6 +77,11 @@ public:
 class title_window : public crtp_window<title_window>
 {
 public:
+  title_window() = default;
+  title_window(int lines, int cols, int begin_y, int begin_x,
+               std::string t)
+    : crtp_window{lines, cols, begin_y, begin_x},
+      title{std::move(t)} {}
   using crtp_window::crtp_window;
   void draw_implementation();
   border_width get_border_width_impl() const
