@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <clocale>
+#include <locale>
 
 namespace
 {
@@ -77,7 +78,7 @@ interface::run()
             auto& entries = m.get_entries();
             entries.sort(
               [](const menu::item_type& a, const menu::item_type& b)
-              { return a.name < b.name; });
+              { return std::locale("")(a.name, b.name); });
             m.refresh();
             pos_menu_cursor(m.get_ptr());
             refresh();
