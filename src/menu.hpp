@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include <menu.h>
 #include <vector>
+#include <list>
 #include <string>
 
 #include "window.hpp"
@@ -85,9 +86,9 @@ public:
   void set_menu_mark(const char* mark) { ::set_menu_mark(men.get(), mark); }
   bool is_posted() const { return posted; }
 
-        std::vector<item_type>& get_entries()       { return entries; }
-  const std::vector<item_type>& get_entries() const { return entries; }
-  void set_entries(std::vector<item_type>&& e)
+        std::list<item_type>& get_entries()       { return entries; }
+  const std::list<item_type>& get_entries() const { return entries; }
+  void set_entries(std::list<item_type>&& e)
     { pointers_valid = false; entries = std::move(e); }
 
   MENU* get_ptr() { return men.get(); }
@@ -95,7 +96,7 @@ public:
 private:
   menu_ptr men;
   WINDOW* win;
-  std::vector<item_type> entries;
+  std::list<item_type> entries;
   std::vector<ITEM*> entries_p;
   bool pointers_valid;
   bool posted;

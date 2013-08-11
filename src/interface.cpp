@@ -75,7 +75,7 @@ interface::run()
             auto desc = ask_user("Add (Description): ");
             m.add_entry(name.data(), desc.data());
             auto& entries = m.get_entries();
-            std::sort(begin(entries), end(entries),
+            entries.sort(
               [](const menu::item_type& a, const menu::item_type& b)
               { return a.name < b.name; });
             m.refresh();
