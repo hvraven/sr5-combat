@@ -108,7 +108,7 @@ private:
 
 typedef basic_menu<default_item> menu;
 
-#include "menu.hpp.include"
+#include "menu.impl.hpp"
 
 extern template class basic_menu<default_item>;
 
