@@ -32,7 +32,7 @@ menu_category_impl::message(int ev) const
     case menu_error::no_match:
       return "Character failed to match.";
     case menu_error::not_selectable:
-      return "missing translation";
+      return "The designated item cannot be selected.";
     case menu_error::not_connected:
       return "No items are connected to the menu.";
     case menu_error::request_denied:
@@ -46,7 +46,7 @@ menu_category_impl::message(int ev) const
 
 bool
 menu_category_impl::equivalent(const std::error_code&,
-                                 int condition) const noexcept
+                               int condition) const noexcept
 {
   switch (condition)
     {
