@@ -1,6 +1,7 @@
 #include "interface.hpp"
 
-#include <menu.h>
+#include "ncurses.hpp"
+#include <ncurses.h>
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -14,15 +15,15 @@ ask_user(const char* question)
 {
   mvprintw(LINES - 1, 0, question);
   clrtoeol();
-  echo();
-  nocbreak();
+  ncurses::echo(true);
+  ncurses::cbreak(false);
   std::string result;
   for (int c = getch(); c != '\n'; c = getch())
     result += c;
   move(LINES - 1, 0);
   clrtoeol();
-  noecho();
-  cbreak();
+  ncurses::echo(false);
+  ncurses::cbreak(true);
   return result;
 }
 
@@ -33,20 +34,17 @@ interface::interface()
     m{}
 {
   setlocale(LC_ALL, "");
-  initscr();
-  start_color();
-  cbreak();
-  noecho();
-  nonl();
-  keypad(stdscr, true);
+  ncurses::init();
+  ncurses::cbreak(true);
+  ncurses::echo(false);
+  ncurses::keypad(true);
 
   init_pair(1, COLOR_RED, COLOR_BLACK);
 
-  win = newwin(10,40,4,4);
-  keypad(win.ptr(), true);
+  win = title_window{0,0,0,0};
+  win.keypad(true);
+  win.set_title("My Menu");
 
-  m.set_size(6,1);
-  m.set_menu_mark(" * ");
 
   m.add_entry("test1", "Testeintrag 1");
   m.add_entry("test2", "Testeintrag 2");
@@ -57,16 +55,11 @@ interface::interface()
   m.add_entry("test7", "Testeintrag 7");
   m.add_entry("test8", "Testeintrag 8");
 
-  m.add_to_window(win.ptr(), 6, 38, 3, 1);
+  m.add_to_window(win);
+  m.set_menu_mark(" * ");
   m.post();
 
-  box(win.ptr(), 0, 0);
-  wattron(win.ptr(), COLOR_PAIR(1));
-  mvwprintw(win.ptr(), 1, 2, "My Menu");
-  wattroff(win.ptr(), COLOR_PAIR(1));
-  mvwaddch(win.ptr(), 2, 0, ACS_LTEE);
-  mvwhline(win.ptr(), 2, 1, ACS_HLINE, 38);
-  mvwaddch(win.ptr(), 2, 39, ACS_RTEE);
+  win.draw_decoration();
   refresh();
 }
 

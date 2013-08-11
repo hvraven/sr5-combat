@@ -7,6 +7,7 @@
 #include <string>
 
 #include "window.hpp"
+#include "error.hpp"
 
 struct default_item
 {
@@ -76,7 +77,8 @@ public:
   void move_cursor(int dir);
   void post();
   void unpost();
-  void add_to_window(WINDOW* win, int starty, int startx, int width, int height);
+  template <class W>
+  void add_to_window(W& win);
   void add_entry(std::string&& name, std::string&& description);
   void refresh();
   void set_size(int rows, int cols);
@@ -98,8 +100,8 @@ private:
   bool pointers_valid;
   bool posted;
 
-  int rows;
-  int cols;
+  int rows = 10;
+  int cols = 1;
 
   void update_entries();
 };
@@ -127,6 +129,7 @@ basic_menu<T>::~basic_menu()
 };
 
 template<class T>
+inline
 void
 basic_menu<T>::add_entry(std::string&& name, std::string&& description)
 {
@@ -135,6 +138,7 @@ basic_menu<T>::add_entry(std::string&& name, std::string&& description)
 };
 
 template<class T>
+inline
 void
 basic_menu<T>::move_cursor(int dir)
 {
@@ -142,13 +146,21 @@ basic_menu<T>::move_cursor(int dir)
   wrefresh(win);
 }
 
-template<class T>
+template <class T>
+template <class W>
 void
-basic_menu<T>::add_to_window(WINDOW* w, int starty, int startx, int width, int height)
+basic_menu<T>::add_to_window(W& w)
 {
-  win = w;
-  set_menu_win(men.get(), win);
-  set_menu_sub(men.get(), derwin(win, starty, startx, width, height));
+  win = w.ptr();
+  const auto borders = w.get_border_width();
+  const auto wsize = w.get_window_size();
+  const auto width = wsize.cols - borders.right - borders.left;
+  const auto height = wsize.lines - borders.top - borders.bottom;
+  check_for_menu_error(set_menu_win(men.get(), win));
+  check_for_menu_error(set_menu_sub(men.get(), derwin(win, width, height,
+                                                      borders.top,
+                                                      borders.left)));
+  rows = height;
 }
 
 template<class T>
@@ -166,12 +178,14 @@ basic_menu<T>::post()
 };
 
 template<class T>
+inline
 void
 basic_menu<T>::set_size(int r, int c)
 {
   rows = r;
   cols = c;
-  set_menu_format(men.get(), rows, cols);
+  if (!entries_p.empty())
+    check_for_menu_error(set_menu_format(men.get(), rows, cols));
   refresh();
 };
 
@@ -182,12 +196,13 @@ basic_menu<T>::refresh()
   if (! is_posted())
     return;
 
-  unpost_menu(men.get());
-
   if (! pointers_valid)
-    update_entries();
+    {
+      unpost_menu(men.get());
+      update_entries();
+      post_menu(men.get());
+    }
 
-  post_menu(men.get());
   wrefresh(win);
 };
 

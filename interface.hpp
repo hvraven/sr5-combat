@@ -1,12 +1,7 @@
 #ifndef SHADOWRUN5_COMBAT_CHARACTER_HPP
 #define SHADOWRUN5_COMBAT_CHARACTER_HPP
 
-#define _XOPEN_SOURCE_EXTENDED
-#include <ncurses.h>
-#include <menu.h>
-#include <vector>
-#include <memory>
-#include <string>
+#include "window.hpp"
 #include "menu.hpp"
 
 // for testing, needs to be done proper later...
@@ -19,7 +14,7 @@ public:
   void run();
 
 private:
-  window win;
+  title_window win;
   menu m;
 };
 
