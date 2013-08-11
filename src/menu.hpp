@@ -110,4 +110,6 @@ typedef basic_menu<default_item> menu;
 
 #include "menu.hpp.include"
 
+extern template class basic_menu<default_item>;
+
 #endif // SHADOWRUN5_COMBAT_MENU_HPP
