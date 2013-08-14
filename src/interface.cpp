@@ -87,12 +87,15 @@ void
 interface::add_char()
 {
   auto name = ask_user("Add (Name): ");
-  auto& entries = m.get_entries();
-  entries.emplace_back(std::move(name), "");
-  entries.sort(
-    [](const menu_type::item_type& a, const menu_type::item_type& b)
-    { return std::locale("")(a.name, b.name); });
-  m.refresh();
+  if (!name.empty())
+    {
+      auto& entries = m.get_entries();
+      entries.emplace_back(std::move(name), "");
+      entries.sort(
+        [](const menu_type::item_type& a, const menu_type::item_type& b)
+        { return std::locale("")(a.name, b.name); });
+      m.refresh();
+    }
   pos_menu_cursor(m.get_ptr());
   refresh();
 }
