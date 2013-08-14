@@ -11,19 +11,40 @@
 #include "window.hpp"
 #include "error.hpp"
 
-struct default_item
+template <class Derived>
+class basic_item
 {
-  using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
+public:
+  const char* get_name() const
+    { return static_cast<const Derived*>(this)->get_name_impl(); }
+  const char* get_desc() const
+    { return static_cast<const Derived*>(this)->get_desc_impl(); }
 
+  explicit operator ITEM*() { return ptr.get(); }
+
+  basic_item()
+    : ptr{nullptr, &free_item} {}
+
+  using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
+  item_ptr ptr;
+
+protected:
+  void init();
+};
+
+struct default_item : basic_item<default_item>
+{
   /// name may not be empty
   template <class N, class S>
   default_item(N&& n, S&& s)
-    : ptr{nullptr, &free_item},
+    : basic_item<default_item>{},
       name{std::forward<N>(n)},
       desc{std::forward<S>(s)}
-    { ptr.reset(new_item(name.data(), desc.data())); }
+  { init(); }
 
-  item_ptr ptr;
+  const char* get_name_impl() const { return name.data(); }
+  const char* get_desc_impl() const { return desc.data(); }
+
   std::string name;
   std::string desc;
 };
