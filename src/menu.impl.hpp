@@ -57,6 +57,42 @@ basic_menu<T>::add_to_window(basic_window& w)
   rows = height;
 }
 
+template <class T>
+inline
+void
+basic_menu<T>::opt_on(opt o)
+{
+  check_for_menu_error(menu_opts_on(men.get(),
+                                    static_cast<Menu_Options>(o)));
+}
+
+template <class T>
+inline
+void
+basic_menu<T>::opt_off(opt o)
+{
+  check_for_menu_error(menu_opts_off(men.get(),
+                                     static_cast<Menu_Options>(o)));
+}
+
+template <class T>
+void
+basic_menu<T>::set_opts(std::initializer_list<opt> opts)
+{
+  Menu_Options o = std::accumulate(begin(opts), end(opts), 0,
+    [](Menu_Options f, opt s){ return std::bit_or<Menu_Options>()
+                                (f, static_cast<Menu_Options>(s)); });
+  check_for_menu_error(set_menu_opts(men.get(), o));
+}
+
+template <class T>
+inline
+typename basic_menu<T>::opt
+basic_menu<T>::get_opts() const noexcept
+{
+  return static_cast<opt>(menu_opts(men.get()));
+};
+
 template<class T>
 void
 basic_menu<T>::post()

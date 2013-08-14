@@ -6,6 +6,7 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <initializer_list>
 
 #include "window.hpp"
 #include "error.hpp"
@@ -72,6 +73,16 @@ class basic_menu
 public:
   using item_type = I;
 
+  enum class opt
+  {
+    one_value        = O_ONEVALUE,
+    show_description = O_SHOWDESC,
+    row_major        = O_ROWMAJOR,
+    ignore_case      = O_IGNORECASE,
+    show_match       = O_SHOWMATCH,
+    non_cyclic       = O_NONCYCLIC
+  };
+
   basic_menu();
   ~basic_menu();
 
@@ -85,6 +96,11 @@ public:
   void set_menu_mark(const char* mark) { ::set_menu_mark(men.get(), mark); }
   bool is_posted() const { return posted; }
   bool is_empty() const { return entries.empty(); }
+
+  void opt_on(opt);
+  void opt_off(opt);
+  void set_opts(std::initializer_list<opt> opts);
+  opt get_opts() const noexcept;
 
   std::list<item_type>& get_entries()
     { pointers_valid = false; return entries;}
