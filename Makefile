@@ -25,7 +25,7 @@ TARGETS        = $(patsubst $(SRCDIR)/%.cpp, %, $(TARGETSRCS))
 BUILD_TARGETS  = $(patsubst %,$(BUILDDIR)/%, $(TARGETS))
 
 .DEFAULT_GOAL: all
-all: interface_test
+all: $(TARGETS)
 
 $(TARGETS): %: $(BUILDDIR)/%
 	cp $^ $@
