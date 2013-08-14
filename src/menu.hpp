@@ -11,83 +11,105 @@
 #include "window.hpp"
 #include "error.hpp"
 
-template <class Derived>
-class basic_item
+struct owning_name_model
 {
-public:
   const char* get_name() const
-    { return static_cast<const Derived*>(this)->get_name_impl(); }
+    { return name.data(); }
   const char* get_desc() const
-    { return static_cast<const Derived*>(this)->get_desc_impl(); }
-
-  explicit operator ITEM*() { return ptr.get(); }
-
-  basic_item()
-    : ptr{nullptr, &free_item} {}
-
-  using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
-  item_ptr ptr;
-
-protected:
-  void init();
-};
-
-struct default_item : basic_item<default_item>
-{
-  /// name may not be empty
-  template <class N, class S>
-  default_item(N&& n, S&& s)
-    : basic_item<default_item>{},
-      name{std::forward<N>(n)},
-      desc{std::forward<S>(s)}
-  { init(); }
-
-  const char* get_name_impl() const { return name.data(); }
-  const char* get_desc_impl() const { return desc.data(); }
+    { return desc.data(); }
 
   std::string name;
   std::string desc;
+
+protected:
+  ~owning_name_model() {}
 };
 
+struct pointer_name_model
+{
+  const char* get_name() const
+    { return name; }
+  const char* get_desc() const
+    { return desc; }
+
+  // TODO remove those two pointers
+  const char* name;
+  const char* desc;
+};
+
+struct no_data_model
+{};
+
 template <class T>
-struct owning_item : public default_item
+struct owning_data_model
+{
+  void set_data(T t) { data = std::move(t); }
+  const T& get_data() const { return data; }
+        T& get_data()       { return data; }
+
+  T data;
+};
+
+/*
+template <class T>
+struct pointer_data_model
+{
+  void set_data(T t) { data = std::move(t); }
+  const T& get_data() const { return data; }
+        T& get_data()       { return data; }
+};
+*/
+
+template <class NameModel = owning_name_model>
+class basic_item : public NameModel
+{
+public:
+  explicit operator ITEM*() { return ptr.get(); }
+
+  template <class N, class M>
+  basic_item(N&& n, M&& m)
+    : NameModel{std::forward<N>(n), std::forward<M>(m)},
+      ptr{new_item(NameModel::get_name(),
+                   NameModel::get_desc()),
+          &free_item} {}
+
+  using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
+  item_ptr ptr;
+};
+
+using default_item = basic_item<owning_name_model>;
+
+template <class T, class NameModel = owning_name_model>
+struct owning_item : public basic_item<NameModel>
 {
   using data_type = T;
+  using base = basic_item<NameModel>;
 
+  using base::base;
+
+  const data_type& get_data() const { return user_data; }
+        data_type& get_data()       { return user_data; }
+
+  void set_data(data_type d)
+    { base::ptr->userptr = static_cast<void*>(&user_data);
+      user_data = std::move(d); }
+
+protected:
   data_type user_data;
-
-  owning_item() = default;
-  template <class N, class S>
-  owning_item(N&& n, S&& s)
-    : default_item{std::forward<N>(n), std::forward<S>(s)},
-      user_data{}
-    { ptr->userptr = static_cast<void*>(&user_data); }
-  template <class N, class S, class U>
-  owning_item(N&& n, S&& s, U&& u)
-    : default_item{std::forward<N>(n), std::forward<S>(s)},
-      user_data{std::forward<U>(u)}
-    { ptr->userptr = static_cast<void*>(&user_data); }
-
-  data_type* data() { return &user_data; }
 };
 
-template <class T>
-struct pointer_item : public default_item
+template <class T, class NameModel = owning_name_model>
+struct pointer_item : public basic_item<NameModel>
 {
   using data_type = T;
+  using base = basic_item<NameModel>;
 
-  pointer_item() = default;
-  template <class N, class S>
-  pointer_item(N&& n, S&& s)
-    : default_item{std::forward<N>(n), std::forward<S>(s)}
-    {}
-  template <class N, class S>
-  pointer_item(N&& n, S&& s, data_type* u)
-    : default_item{std::forward<N>(n), std::forward<S>(s)}
-    { ptr->userptr = static_cast<void*>(u); }
+  using base::base;
 
-  data_type* data() const { return static_cast<data_type*>(ptr->userptr); }
-  void data(data_type* n) { ptr->userptr = static_cast<void*>(n); }
+  data_type* get_data() const
+    { return static_cast<data_type*>(base::ptr->userptr); }
+  void set_data(data_type* n)
+    { base::ptr->userptr = static_cast<void*>(n); }
 };
 
 template <class I = default_item>

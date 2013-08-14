@@ -16,7 +16,8 @@ public:
   void run();
 
 private:
-  using menu_type = basic_menu<pointer_item<character>>;
+  using item_type = pointer_item<character, owning_name_model>;
+  using menu_type = basic_menu<item_type>;
   title_window win;
   menu_type m;
   std::vector<character> chars;

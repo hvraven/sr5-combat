@@ -1,15 +1,5 @@
 #include <algorithm>
 
-template <class Derived>
-void
-basic_item<Derived>::init()
-{
-  auto p = new_item(get_name(), get_desc());
-  if (p == nullptr)
-    throw curses_error("new_item failed");
-  ptr.reset(p);
-}
-
 template<class T>
 basic_menu<T>::basic_menu()
   : win{nullptr},
