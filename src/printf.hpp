@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cstdio>
 #include <cassert>
+#include <cstddef>
 
 namespace
 {
