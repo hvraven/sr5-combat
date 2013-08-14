@@ -32,7 +32,8 @@ ask_user(const char* question)
 
 interface::interface()
   : win{},
-    m{}
+    m{},
+    chars{}
 {
   setlocale(LC_ALL, "");
   ncurses::init();
@@ -40,21 +41,14 @@ interface::interface()
   ncurses::echo(false);
   ncurses::keypad(true);
 
-  init_pair(1, COLOR_RED, COLOR_BLACK);
-
-  win = title_window{LINES - 1,0,0,0,"Testmenü"};
+  win = title_window{LINES - 2,0,0,0,"Testmenü"};
+  mvprintw(LINES - 1, 0, "[A]dd");
   win.keypad(true);
 
-  m.add_entry("test1", "Testeintrag 1");
-  m.add_entry("test2", "Testeintrag 2");
-  m.add_entry("test3", "Testeintrag 3");
-  m.add_entry("test4", "Testeintrag 4");
-  m.add_entry("test5", "Langer Testeintrag 5");
-  m.add_entry("test6", "Längerer Testeintrag 6");
-  m.add_entry("test7", "Testeintrag 7");
-  m.add_entry("test8", "Testeintrag 8");
+  m.set_menu_mark(" ");
+  m.set_opts({menu_type::opt::one_value,
+              menu_type::opt::show_match});
 
-  m.set_menu_mark(" * ");
   m.add_to_window(win);
   m.post();
 
@@ -71,19 +65,8 @@ interface::run()
       switch(c)
         {
         case 'a':
-          {
-            auto name = ask_user("Add (Name): ");
-            auto desc = ask_user("Add (Description): ");
-            m.add_entry(name.data(), desc.data());
-            auto& entries = m.get_entries();
-            entries.sort(
-              [](const menu::item_type& a, const menu::item_type& b)
-              { return std::locale("")(a.name, b.name); });
-            m.refresh();
-            pos_menu_cursor(m.get_ptr());
-            refresh();
-            break;
-          }
+          add_char();
+          break;
         case KEY_DOWN:
           m.move_cursor(REQ_DOWN_ITEM);
           break;
@@ -98,6 +81,20 @@ interface::run()
           break;
         }
     }
+}
+
+void
+interface::add_char()
+{
+  auto name = ask_user("Add (Name): ");
+  auto& entries = m.get_entries();
+  entries.emplace_back(std::move(name), "");
+  entries.sort(
+    [](const menu_type::item_type& a, const menu_type::item_type& b)
+    { return std::locale("")(a.name, b.name); });
+  m.refresh();
+  pos_menu_cursor(m.get_ptr());
+  refresh();
 }
 
 interface::~interface()
