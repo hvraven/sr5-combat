@@ -84,8 +84,10 @@ public:
   void set_size(int rows, int cols);
   void set_menu_mark(const char* mark) { ::set_menu_mark(men.get(), mark); }
   bool is_posted() const { return posted; }
+  bool is_empty() const { return entries.empty(); }
 
-        std::list<item_type>& get_entries()       { return entries; }
+  std::list<item_type>& get_entries()
+    { pointers_valid = false; return entries;}
   const std::list<item_type>& get_entries() const { return entries; }
   void set_entries(std::list<item_type>&& e)
     { pointers_valid = false; entries = std::move(e); }

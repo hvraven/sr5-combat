@@ -32,6 +32,8 @@ inline
 void
 basic_menu<T>::move_cursor(int dir)
 {
+  if (entries_p.empty())
+    return;
   check_for_menu_error(menu_driver(men.get(), dir),
                        {menu_error::request_denied});
   win->refresh();
@@ -59,7 +61,7 @@ template<class T>
 void
 basic_menu<T>::post()
 {
-  if (is_posted())
+  if (is_posted() || is_empty())
     return;
   if (! pointers_valid)
     update_entries();
@@ -85,14 +87,13 @@ template<class T>
 void
 basic_menu<T>::refresh()
 {
-  if (! is_posted())
-    return;
-
   if (! pointers_valid)
     {
-      check_for_menu_error(unpost_menu(men.get()));
+      if (is_posted())
+        check_for_menu_error(unpost_menu(men.get()));
       update_entries();
       check_for_menu_error(post_menu(men.get()));
+      posted = true;
     }
 
   win->refresh();
