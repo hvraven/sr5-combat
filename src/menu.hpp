@@ -15,6 +15,7 @@ struct default_item
 {
   using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
 
+  /// name may not be empty
   template <class N, class S>
   default_item(N&& n, S&& s)
     : ptr{nullptr, &free_item},
@@ -34,11 +35,12 @@ struct owning_item : public default_item
 
   data_type user_data;
 
+  owning_item() = default;
   template <class N, class S>
   owning_item(N&& n, S&& s)
     : default_item{std::forward<N>(n), std::forward<S>(s)},
       user_data{}
-    { ptr->userptr = static_cast<void*>(&data); }
+    { ptr->userptr = static_cast<void*>(&user_data); }
   template <class N, class S, class U>
   owning_item(N&& n, S&& s, U&& u)
     : default_item{std::forward<N>(n), std::forward<S>(s)},
@@ -53,6 +55,7 @@ struct pointer_item : public default_item
 {
   using data_type = T;
 
+  pointer_item() = default;
   template <class N, class S>
   pointer_item(N&& n, S&& s)
     : default_item{std::forward<N>(n), std::forward<S>(s)}
@@ -108,7 +111,8 @@ public:
   void set_entries(std::list<item_type>&& e)
     { pointers_valid = false; entries = std::move(e); }
 
-  MENU* get_ptr() { return men.get(); }
+        MENU* get_ptr()       noexcept { return men.get(); }
+  const MENU* get_ptr() const noexcept { return men.get(); }
 
 private:
   basic_window* win;
