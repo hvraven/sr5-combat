@@ -1,5 +1,5 @@
-#ifndef SHADOWRUN5_COMBAT_CHARACTER_HPP
-#define SHADOWRUN5_COMBAT_CHARACTER_HPP
+#ifndef SHADOWRUN5_COMBAT_INTERFACE_HPP
+#define SHADOWRUN5_COMBAT_INTERFACE_HPP
 
 #include "window.hpp"
 #include "menu.hpp"
@@ -18,4 +18,4 @@ private:
   menu m;
 };
 
-#endif // SHADOWRUN5_COMBAT_CHARACTER_HPP
+#endif // SHADOWRUN5_COMBAT_INTERFACE_HPP
