@@ -41,9 +41,6 @@ struct character
   std::string name;
   initiative_c initiative;
 
-  const char* get_name() const { return name.data(); }
-  const char* get_desc() const { return nullptr; }
-
   const std::string& get_identifier() const { return name; }
 };
 

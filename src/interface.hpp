@@ -18,7 +18,7 @@ struct character_name_model
 template <class T>
 using character_data_model = owning_data_model<character, T>;
 
-using character_item = basic_item<data_name_model, character_data_model>;
+using character_item = basic_item<str_fun_name_model, character_data_model>;
 
 // for testing, needs to be done proper later...
 class interface
@@ -29,9 +29,9 @@ public:
 
   void run();
 
-private:
   using item_type = character_item;
   using menu_type = basic_menu<item_type>;
+private:
   title_window win;
   menu_type m;
   std::vector<character> chars;

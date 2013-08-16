@@ -83,6 +83,17 @@ interface::run()
     }
 }
 
+namespace
+{
+
+std::string
+gen_display_name(const interface::item_type& item)
+{
+  return item.data.name + ' ' + std::to_string(item.data.initiative.roll());
+}
+
+} // anonymous namespace
+
 void
 interface::add_char()
 {
@@ -92,7 +103,7 @@ interface::add_char()
       auto& entries = m.get_entries();
       character c;
       c.name = std::move(name);
-      entries.push_back(c);
+      entries.emplace_back(&gen_display_name, nullptr, c);
       entries.sort(
         [](const menu_type::item_type& a, const menu_type::item_type& b)
         { return std::locale("")(std::string{a.get_name()},
