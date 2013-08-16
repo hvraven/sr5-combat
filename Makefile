@@ -9,8 +9,8 @@ PKGCONFIG_LDFLAGS   = $(shell pkg-config --libs $(PKGCONFIG_LIBRARIES))
 
 # Compiler Options
 CXXFLAGS       = -Wall -Wextra -ggdb
-CPPFLAGS       = -std=c++11 -I$(SRCDIR) $(PKGCONFIG_CPPFLAGS)
-LDFLAGS        = $(PKGCONFIG_LDFLAGS)
+CPPFLAGS       = -std=c++11 -I$(SRCDIR) $(PKGCONFIG_CPPFLAGS) -stdlib=libc++
+LDFLAGS        = $(PKGCONFIG_LDFLAGS) -stdlib=libc++
 
 df             = $(BUILDDIR)/$(*F)
 MAKEDEPEND     = $(CXX) -MM $(CPPFLAGS) $<
