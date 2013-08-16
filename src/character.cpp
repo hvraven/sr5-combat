@@ -3,7 +3,8 @@
 #include "dice.hpp"
 
 int
-initiative_c::roll() const
+initiative_c::roll()
 {
-  return base + temp + roll_d6(dice);
+  current = base + temp + roll_d6(dice);
+  return current;
 };

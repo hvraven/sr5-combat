@@ -3,10 +3,12 @@
 #include "ncurses.hpp"
 #include <ncurses.h>
 #include <algorithm>
-#include <memory>
-#include <string>
 #include <clocale>
-#include <locale>
+#include <iomanip>
+#include <ios>
+#include <memory>
+#include <sstream>
+#include <string>
 
 namespace
 {
@@ -89,7 +91,11 @@ namespace
 std::string
 gen_display_name(const interface::item_type& item)
 {
-  return item.data.name + ' ' + std::to_string(item.data.initiative.roll());
+  std::ostringstream ss;
+  ss << std::right << std::setw(2)
+     << item.data.initiative.get_current() << " "
+     << item.data.name;
+  return ss.str();
 }
 
 } // anonymous namespace
@@ -103,11 +109,12 @@ interface::add_char()
       auto& entries = m.get_entries();
       character c;
       c.name = std::move(name);
+      c.initiative.roll();
       entries.emplace_back(&gen_display_name, nullptr, c);
       entries.sort(
         [](const menu_type::item_type& a, const menu_type::item_type& b)
-        { return std::locale("")(std::string{a.get_name()},
-                                 std::string{b.get_name()}); });
+        { return std::greater<int>{}(a.data.initiative.get_current(),
+                                     b.data.initiative.get_current()); });
       m.refresh();
     }
   pos_menu_cursor(m.get_ptr());
