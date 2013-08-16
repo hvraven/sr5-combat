@@ -12,35 +12,35 @@ menu_category_impl::message(int ev) const
   switch (static_cast<menu_error>(ev))
     {
     case menu_error::ok:
-      return "The routine succeeded.";
+      return {"The routine succeeded."};
     case menu_error::system_error:
-      return "System error occured (see errno).";
+      return {"System error occured (see errno)."};
     case menu_error::bad_argument:
-      return "Routine detected an incorrect or out-of-range argument.";
+      return {"Routine detected an incorrect or out-of-range argument."};
     case menu_error::posted:
-      return "The menu has already been posted.";
+      return {"The menu has already been posted."};
     case menu_error::connected:
-      return "missing translation";
+      return {"missing translation"};
     case menu_error::bad_state:
-      return "Routine was called from an initilization or termination function.";
+      return {"Routine was called from an initilization or termination function."};
     case menu_error::no_room:
-      return "Menu is too large for its window.";
+      return {"Menu is too large for its window."};
     case menu_error::not_posted:
-      return "The menu has not been posted.";
+      return {"The menu has not been posted."};
     case menu_error::unknown_command:
-      return "The menu driver saw an unknown request code.";
+      return {"The menu driver saw an unknown request code."};
     case menu_error::no_match:
-      return "Character failed to match.";
+      return {"Character failed to match."};
     case menu_error::not_selectable:
-      return "The designated item cannot be selected.";
+      return {"The designated item cannot be selected."};
     case menu_error::not_connected:
-      return "No items are connected to the menu.";
+      return {"No items are connected to the menu."};
     case menu_error::request_denied:
-      return "The menu driver could not process the request.";
+      return {"The menu driver could not process the request."};
     case menu_error::invalid_field:
-      return "missing translation";
+      return {"missing translation"};
     case menu_error::current:
-      return "missing translation";
+      return {"missing translation"};
     }
 };
 
