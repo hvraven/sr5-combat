@@ -3,7 +3,7 @@
 
 #include <string>
 
-class initiative
+class initiative_c
 {
 public:
   constexpr int get_base() const { return base; }
@@ -16,7 +16,7 @@ public:
   void set_temp(int t) { temp = t; }
   void reset_temp() { temp = 0; }
 
-  initiative& operator+=(int n){ temp += n; return *this; }
+  initiative_c& operator+=(int n){ temp += n; return *this; }
 
 private:
   int base = 0;
@@ -24,17 +24,17 @@ private:
   int temp = 0;
 };
 
-inline initiative& operator-=(initiative& ini, int n)
+inline initiative_c& operator-=(initiative_c& ini, int n)
   { return ini += -n; }
-inline initiative& operator+(initiative& ini, int n)
+inline initiative_c& operator+(initiative_c& ini, int n)
   { ini += n; return ini; }
-inline initiative& operator-(initiative& ini, int n)
+inline initiative_c& operator-(initiative_c& ini, int n)
   { ini -= n; return ini; }
 
 struct character
 {
   std::string name;
-  initiative ini;
+  initiative_c initiative;
 
   const std::string& get_identifier() const { return name; }
 };

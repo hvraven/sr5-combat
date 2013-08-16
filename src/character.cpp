@@ -3,7 +3,7 @@
 #include "dice.hpp"
 
 int
-initiative::roll() const
+initiative_c::roll() const
 {
   return base + temp + roll_d6(dice);
 };
