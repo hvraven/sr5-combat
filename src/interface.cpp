@@ -90,10 +90,13 @@ interface::add_char()
   if (!name.empty())
     {
       auto& entries = m.get_entries();
-      entries.emplace_back(std::move(name), "");
+      character c;
+      c.name = std::move(name);
+      entries.push_back(c);
       entries.sort(
         [](const menu_type::item_type& a, const menu_type::item_type& b)
-        { return std::locale("")(a.name, b.name); });
+        { return std::locale("")(std::string{a.get_name()},
+                                 std::string{b.get_name()}); });
       m.refresh();
     }
   pos_menu_cursor(m.get_ptr());

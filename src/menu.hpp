@@ -11,6 +11,7 @@
 #include "window.hpp"
 #include "error.hpp"
 
+template <class Derived>
 struct owning_name_model
 {
   const char* get_name() const
@@ -25,6 +26,7 @@ protected:
   ~owning_name_model() {}
 };
 
+template <class Derived>
 struct pointer_name_model
 {
   const char* get_name() const
@@ -37,10 +39,21 @@ struct pointer_name_model
   const char* desc;
 };
 
-struct no_data_model
-{};
+template <class Derived>
+struct data_name_model
+{
+  const char* get_name() const
+    { return static_cast<const Derived*>(this)->get_data().get_name(); }
+  const char* get_desc() const
+    { return static_cast<const Derived*>(this)->get_data().get_desc(); }
+};
 
-template <class T>
+template <class Derived>
+struct no_data_model
+{
+};
+
+template <class T, class Derived>
 struct owning_data_model
 {
   void set_data(T t) { data = std::move(t); }
@@ -50,67 +63,65 @@ struct owning_data_model
   T data;
 };
 
-/*
-template <class T>
+template <class T, class Derived>
 struct pointer_data_model
 {
-  void set_data(T t) { data = std::move(t); }
-  const T& get_data() const { return data; }
-        T& get_data()       { return data; }
+  void set_data_ptr(T* t)
+    { Derived::ptr->userptr = static_cast<void*>(t); }
+  const T& get_data() const
+    { return *static_cast<T*>(Derived::ptr->userptr); }
+        T& get_data()
+    { return *static_cast<T*>(Derived::ptr->userptr); }
+  const T* get_data_ptr() const
+    { return static_cast<T*>(Derived::ptr->userptr); }
+        T* get_data_ptr()
+    { return static_cast<T*>(Derived::ptr->userptr); }
 };
-*/
 
-template <class NameModel = owning_name_model>
-class basic_item : public NameModel
+template <
+  template <class Base> class NameModel,
+  template <class Base> class DataModel
+>
+class basic_item
+  : public NameModel<basic_item<NameModel, DataModel>>,
+    public DataModel<basic_item<NameModel, DataModel>>
 {
 public:
   explicit operator ITEM*() { return ptr.get(); }
+  using name_model = NameModel<basic_item<NameModel,DataModel>>;
+  using data_model = DataModel<basic_item<NameModel,DataModel>>;
+
+  template <class N>
+  basic_item(N&& n)
+    : name_model{},
+      data_model{std::forward<N>(n)},
+      ptr{new_item(name_model::get_name(),
+                   name_model::get_desc()),
+          &free_item} {}
+
 
   template <class N, class M>
   basic_item(N&& n, M&& m)
-    : NameModel{std::forward<N>(n), std::forward<M>(m)},
-      ptr{new_item(NameModel::get_name(),
-                   NameModel::get_desc()),
+    : name_model{std::forward<N>(n), std::forward<M>(m)},
+      data_model{},
+      ptr{new_item(name_model::get_name(),
+                   name_model::get_desc()),
           &free_item} {}
+
+  template <class N, class M, class L>
+  basic_item(N&& n, M&& m, L&& l)
+    : name_model{std::forward<N>(n), std::forward<M>(m)},
+      data_model{std::forward<L>(l)},
+      ptr{new_item(name_model::get_name(),
+                   name_model::get_desc()),
+          &free_item} {}
+
 
   using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
   item_ptr ptr;
 };
 
-using default_item = basic_item<owning_name_model>;
-
-template <class T, class NameModel = owning_name_model>
-struct owning_item : public basic_item<NameModel>
-{
-  using data_type = T;
-  using base = basic_item<NameModel>;
-
-  using base::base;
-
-  const data_type& get_data() const { return user_data; }
-        data_type& get_data()       { return user_data; }
-
-  void set_data(data_type d)
-    { base::ptr->userptr = static_cast<void*>(&user_data);
-      user_data = std::move(d); }
-
-protected:
-  data_type user_data;
-};
-
-template <class T, class NameModel = owning_name_model>
-struct pointer_item : public basic_item<NameModel>
-{
-  using data_type = T;
-  using base = basic_item<NameModel>;
-
-  using base::base;
-
-  data_type* get_data() const
-    { return static_cast<data_type*>(base::ptr->userptr); }
-  void set_data(data_type* n)
-    { base::ptr->userptr = static_cast<void*>(n); }
-};
+using default_item = basic_item<owning_name_model, no_data_model>;
 
 template <class I = default_item>
 class basic_menu

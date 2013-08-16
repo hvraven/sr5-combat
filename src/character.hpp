@@ -33,8 +33,16 @@ inline initiative_c& operator-(initiative_c& ini, int n)
 
 struct character
 {
+  character() = default;
+  character(std::string n)
+    : character{}
+  { name = std::move(n); }
+
   std::string name;
   initiative_c initiative;
+
+  const char* get_name() const { return name.data(); }
+  const char* get_desc() const { return nullptr; }
 
   const std::string& get_identifier() const { return name; }
 };
