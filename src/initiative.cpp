@@ -1,4 +1,4 @@
-#include "character.hpp"
+#include "initiative.hpp"
 
 #include "dice.hpp"
 
