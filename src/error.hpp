@@ -3,6 +3,7 @@
 
 #include <initializer_list>
 #include <system_error>
+#include <string>
 #include <menu.h>
 
 class curses_error : public std::runtime_error
