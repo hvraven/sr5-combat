@@ -3,10 +3,11 @@
 
 #include <ncurses.h>
 #include <menu.h>
-#include <vector>
+#include <functional>
+#include <initializer_list>
 #include <list>
 #include <string>
-#include <initializer_list>
+#include <vector>
 
 #include "window.hpp"
 #include "error.hpp"
@@ -46,6 +47,57 @@ struct data_name_model
     { return static_cast<const Derived*>(this)->get_data().get_name(); }
   const char* get_desc() const
     { return static_cast<const Derived*>(this)->get_data().get_desc(); }
+};
+
+template <class Derived>
+struct function_name_model
+{
+  const char* get_name() const
+    {
+      if (name_fun)
+        return name_fun(*static_cast<const Derived*>(this));
+      else
+        return nullptr;
+    }
+  const char* get_desc() const
+    {
+      if (desc_fun)
+        return desc_fun(*static_cast<const Derived*>(this));
+      else
+        return nullptr;
+    }
+
+  std::function<const char*(const Derived&)> name_fun;
+  std::function<const char*(const Derived&)> desc_fun;
+};
+
+template <class Derived>
+struct str_fun_name_model
+{
+  const char* get_name() const
+    {
+      if (name_fun)
+        name = name_fun(*static_cast<const Derived*>(this));
+      return name.data();
+    }
+  const char* get_desc() const
+    {
+      if (desc_fun)
+        desc = desc_fun(*static_cast<const Derived*>(this));
+      return desc.data();
+    }
+
+protected:
+  template <class N, class M>
+  str_fun_name_model(N&& n, M&& m)
+    : name_fun{std::forward<N>(n)}, desc_fun{std::forward<M>(m)},
+      name{}, desc{} {}
+
+private:
+  const std::function<std::string(const Derived&)> name_fun;
+  const std::function<std::string(const Derived&)> desc_fun;
+  mutable std::string name;
+  mutable std::string desc;
 };
 
 template <class Derived>
