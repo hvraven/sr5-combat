@@ -1,4 +1,4 @@
-#include <algorithm>
+#include <numeric>
 
 template<class T>
 basic_menu<T>::basic_menu()
