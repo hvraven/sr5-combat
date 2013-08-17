@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <numeric>
 
 template<class T>
