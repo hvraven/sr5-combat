@@ -15,9 +15,9 @@
 template <class Derived>
 struct owning_name_model
 {
-  const char* get_name() const
+  const char* get_name() const noexcept
     { return name.data(); }
-  const char* get_desc() const
+  const char* get_desc() const noexcept
     { return desc.data(); }
 
   std::string name;
@@ -50,54 +50,27 @@ struct data_name_model
 };
 
 template <class Derived>
-struct function_name_model
+struct function_name_model : public pointer_name_model<Derived>
 {
-  const char* get_name() const
-    {
-      if (name_fun)
-        return name_fun(*static_cast<const Derived*>(this));
-      else
-        return nullptr;
-    }
-  const char* get_desc() const
-    {
-      if (desc_fun)
-        return desc_fun(*static_cast<const Derived*>(this));
-      else
-        return nullptr;
-    }
-
-  std::function<const char*(const Derived&)> name_fun;
-  std::function<const char*(const Derived&)> desc_fun;
+protected:
+  function_name_model(std::function<const char*(const Derived&)> n,
+                      std::function<const char*(const Derived&)> m)
+    : pointer_name_model<Derived>
+        {n(*static_cast<const Derived*>(this)),
+         m ? m(*static_cast<const Derived*>(this)) : nullptr}
+  {}
 };
 
 template <class Derived>
-struct str_fun_name_model
+struct str_fun_name_model : public owning_name_model<Derived>
 {
-  const char* get_name() const
-    {
-      if (name_fun)
-        name = name_fun(*static_cast<const Derived*>(this));
-      return name.data();
-    }
-  const char* get_desc() const
-    {
-      if (desc_fun)
-        desc = desc_fun(*static_cast<const Derived*>(this));
-      return desc.data();
-    }
-
 protected:
-  template <class N, class M>
-  str_fun_name_model(N&& n, M&& m)
-    : name_fun{std::forward<N>(n)}, desc_fun{std::forward<M>(m)},
-      name{}, desc{} {}
-
-private:
-  const std::function<std::string(const Derived&)> name_fun;
-  const std::function<std::string(const Derived&)> desc_fun;
-  mutable std::string name;
-  mutable std::string desc;
+  str_fun_name_model(std::function<std::string(const Derived&)> n,
+                     std::function<std::string(const Derived&)> m)
+    : owning_name_model<Derived>
+        {n(*static_cast<const Derived*>(this)),
+         m ? m(*static_cast<const Derived*>(this)) : ""}
+  {}
 };
 
 template <class Derived>
@@ -135,8 +108,8 @@ template <
   template <class Base> class DataModel
 >
 class basic_item
-  : public NameModel<basic_item<NameModel, DataModel>>,
-    public DataModel<basic_item<NameModel, DataModel>>
+  : public DataModel<basic_item<NameModel, DataModel>>,
+    public NameModel<basic_item<NameModel, DataModel>>
 {
 public:
   explicit operator ITEM*() { return ptr.get(); }
@@ -145,29 +118,30 @@ public:
 
   template <class N>
   basic_item(N&& n)
-    : name_model{},
-      data_model{std::forward<N>(n)},
+    : data_model{std::forward<N>(n)},
+      name_model{},
       ptr{new_item(name_model::get_name(),
                    name_model::get_desc()),
-          &free_item} {}
-
+          &free_item}
+  { if (!ptr) throw curses_error{"Item construction failed"}; }
 
   template <class N, class M>
   basic_item(N&& n, M&& m)
-    : name_model{std::forward<N>(n), std::forward<M>(m)},
-      data_model{},
+    : data_model{},
+      name_model{std::forward<N>(n), std::forward<M>(m)},
       ptr{new_item(name_model::get_name(),
                    name_model::get_desc()),
-          &free_item} {}
+          &free_item}
+  { if (!ptr) throw curses_error{"Item construction failed"}; }
 
   template <class N, class M, class L>
   basic_item(N&& n, M&& m, L&& l)
-    : name_model{std::forward<N>(n), std::forward<M>(m)},
-      data_model{std::forward<L>(l)},
+    : data_model{std::forward<L>(l)},
+      name_model{std::forward<N>(n), std::forward<M>(m)},
       ptr{new_item(name_model::get_name(),
                    name_model::get_desc()),
-          &free_item} {}
-
+          &free_item}
+  { if (!ptr) throw curses_error{"Item construction failed"}; }
 
   using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
   item_ptr ptr;
