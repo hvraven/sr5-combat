@@ -155,6 +155,7 @@ class basic_menu
   using menu_ptr = std::unique_ptr<MENU, decltype(&free_menu)>;
 public:
   using item_type = I;
+  using entries_type = std::list<item_type>;
 
   enum class opt
   {
@@ -185,10 +186,10 @@ public:
   void set_opts(std::initializer_list<opt> opts);
   opt get_opts() const noexcept;
 
-  std::list<item_type>& get_entries()
+  entries_type& get_entries() noexcept
     { pointers_valid = false; return entries;}
-  const std::list<item_type>& get_entries() const { return entries; }
-  void set_entries(std::list<item_type>&& e)
+  const entries_type& get_entries() const noexcept { return entries; }
+  void set_entries(std::list<item_type> e) noexcept
     { pointers_valid = false; entries = std::move(e); }
 
         MENU* get_ptr()       noexcept { return men.get(); }
@@ -196,7 +197,7 @@ public:
 
 private:
   basic_window* win;
-  std::list<item_type> entries;
+  entries_type entries;
   std::vector<ITEM*> entries_p;
   menu_ptr men;
   bool pointers_valid;

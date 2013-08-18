@@ -30,12 +30,19 @@ ask_user(const char* question)
   return result;
 }
 
+void
+show_error(const char* error)
+{
+  mvprintw(LINES - 1, 0, error);
+  clrtoeol();
+}
+
 } // anonymous namespace
 
 interface::interface()
   : win{},
     m{},
-    chars{}
+    data{}
 {
   setlocale(LC_ALL, "");
   ncurses::init();
@@ -93,8 +100,8 @@ gen_display_name(const interface::item_type& item)
 {
   std::ostringstream ss;
   ss << std::right << std::setw(2)
-     << item.data.initiative.get_current() << " "
-     << item.data.name;
+     << item.get_data().ini << " "
+     << item.get_data().ch->name;
   return ss.str();
 }
 
@@ -106,18 +113,30 @@ interface::add_char()
   auto name = ask_user("Add (Name): ");
   if (!name.empty())
     {
-      auto& entries = m.get_entries();
+      auto ini = ask_user("Initiative: ");
       character c;
       c.name = std::move(name);
-      c.initiative.roll();
-      entries.emplace_back(&gen_display_name, nullptr, c);
-      entries.sort(
-        [](const menu_type::item_type& a, const menu_type::item_type& b)
-        { return std::greater<int>{}(a.data.initiative.get_current(),
-                                     b.data.initiative.get_current()); });
-      m.refresh();
+      if (!c.initiative.set_initiative(ini))
+        {
+          show_error("Invalid initiative value!");
+          pos_menu_cursor(m.get_ptr());
+          refresh();
+          return;
+        }
+      data.add_character(std::move(c));
+      update_entries();
     }
   pos_menu_cursor(m.get_ptr());
   refresh();
 }
 
+void
+interface::update_entries()
+{
+  menu_type::entries_type next;
+  auto inis = data.get_remaining_turn();
+  for (auto& ini : data.get_remaining_turn())
+    next.emplace_back(&gen_display_name, nullptr, std::move(ini));
+  m.set_entries(std::move(next));
+  m.refresh();
+}
