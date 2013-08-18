@@ -16,6 +16,7 @@ public:
 
 private:
   ncurses();
+  ~ncurses();
 };
 
 #endif // SHADOWRUN5_COMBAT_NCURSES_HPP

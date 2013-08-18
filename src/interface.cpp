@@ -121,7 +121,3 @@ interface::add_char()
   refresh();
 }
 
-interface::~interface()
-{
-  endwin();
-}

@@ -25,7 +25,6 @@ class interface
 {
 public:
   interface();
-  ~interface();
 
   void run();
 

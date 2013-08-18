@@ -39,3 +39,8 @@ ncurses::ncurses()
   start_color();
   nonl();
 }
+
+ncurses::~ncurses()
+{
+  endwin();
+}
