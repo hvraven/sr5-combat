@@ -11,17 +11,24 @@ initiative_c::roll()
 };
 
 /**
- * parses strings like 16+1d6 or 2d6+34
+ * parses strings like 16+1d6
  */
 bool
 initiative_c::set_initiative(const std::string& s)
 {
-  static const std::regex rgx{R"(\s*(\d+)\s*\+\s*(\d+)[dwDW]6)\s*)"};
+  static const std::regex full{R"(\s*(\d+)\s*\+\s*(\d+)[dwDW]6)\s*)"};
+  static const std::regex value{R"(\s*(\d+)\s*)"};
   std::smatch match;
-  if (std::regex_match(s, match, rgx))
+  if (std::regex_match(s, match, full))
     {
       set_base(std::stoi(match[1].str()));
       set_dice(std::stoi(match[2].str()));
+      return true;
+    }
+  else if (std::regex_match(s, match, value))
+    {
+      set_base(std::stoi(match[1].str()));
+      set_dice(0);
       return true;
     }
   else
