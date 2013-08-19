@@ -143,6 +143,9 @@ public:
           &free_item}
   { if (!ptr) throw curses_error{"Item construction failed"}; }
 
+  void set_selectable(bool);
+  bool get_selectable() const noexcept;
+
   using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
   item_ptr ptr;
 };
