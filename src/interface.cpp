@@ -105,6 +105,13 @@ gen_display_name(const interface::item_type& item)
   return ss.str();
 }
 
+std::string
+gen_marker_name(const interface::item_type& item)
+{
+  return std::string{"Initiative Pass "} +
+    std::to_string(item.get_data().pass);
+}
+
 } // anonymous namespace
 
 void
@@ -135,8 +142,18 @@ interface::update_entries()
 {
   menu_type::entries_type next;
   auto inis = data.get_remaining_turn();
+  auto pass = -1;
   for (auto& ini : data.get_remaining_turn())
-    next.emplace_back(&gen_display_name, nullptr, std::move(ini));
+    {
+      if (ini.pass > pass)
+        {
+          pass = ini.pass;
+          next.emplace_back(&gen_marker_name, nullptr,
+                            combat::ini{0, pass, nullptr});
+          next.back().set_selectable(false);
+        }
+      next.emplace_back(&gen_display_name, nullptr, std::move(ini));
+    }
   m.set_entries(std::move(next));
   m.refresh();
 }
