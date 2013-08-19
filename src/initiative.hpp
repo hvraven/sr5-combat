@@ -9,7 +9,6 @@ public:
   constexpr int get_base() const { return base; }
   constexpr int get_dice() const { return dice; }
   constexpr int get_temp() const { return temp; }
-  constexpr int get_current() const { return current; }
   int roll();
 
   void set_base(int b) { base = b; }
@@ -25,7 +24,6 @@ private:
   int base = 0;
   int dice = 1;
   int temp = 0;
-  int current = 0;
 };
 
 inline initiative_c& operator-=(initiative_c& ini, int n)
