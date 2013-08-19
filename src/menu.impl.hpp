@@ -155,6 +155,26 @@ basic_menu<T>::refresh()
   win->refresh();
 };
 
+template <class T>
+const typename basic_menu<T>::item_type*
+basic_menu<T>::get_current() const
+{
+  const auto current = current_item(men.get());
+  if (current == nullptr)
+    return nullptr;
+  return static_cast<const item_type*>(current->userptr);
+}
+
+template <class T>
+typename basic_menu<T>::item_type*
+basic_menu<T>::get_current()
+{
+  const auto current = current_item(men.get());
+  if (current == nullptr)
+    return nullptr;
+  return static_cast<item_type*>(current->userptr);
+}
+
 template<class T>
 void
 basic_menu<T>::update_entries()

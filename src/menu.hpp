@@ -91,16 +91,14 @@ struct owning_data_model
 template <class T, class Derived>
 struct pointer_data_model
 {
-  void set_data_ptr(T* t)
-    { Derived::ptr->userptr = static_cast<void*>(t); }
-  const T& get_data() const
-    { return *static_cast<T*>(Derived::ptr->userptr); }
-        T& get_data()
-    { return *static_cast<T*>(Derived::ptr->userptr); }
-  const T* get_data_ptr() const
-    { return static_cast<T*>(Derived::ptr->userptr); }
-        T* get_data_ptr()
-    { return static_cast<T*>(Derived::ptr->userptr); }
+  void set_data_ptr(T* t) noexcept { ptr = t; }
+  const T& get_data() const noexcept { return *ptr; }
+        T& get_data()       noexcept { return *ptr; }
+  const T* get_data_ptr() const noexcept { return ptr; }
+        T* get_data_ptr()       noexcept { return ptr; }
+
+private:
+  T* ptr;
 };
 
 template <
@@ -123,7 +121,8 @@ public:
       ptr{new_item(name_model::get_name(),
                    name_model::get_desc()),
           &free_item}
-  { if (!ptr) throw curses_error{"Item construction failed"}; }
+  { if (!ptr) throw curses_error{"Item construction failed"};
+    ptr->userptr = static_cast<void*>(this); }
 
   template <class N, class M>
   basic_item(N&& n, M&& m)
@@ -132,7 +131,8 @@ public:
       ptr{new_item(name_model::get_name(),
                    name_model::get_desc()),
           &free_item}
-  { if (!ptr) throw curses_error{"Item construction failed"}; }
+  { if (!ptr) throw curses_error{"Item construction failed"};
+    ptr->userptr = static_cast<void*>(this); }
 
   template <class N, class M, class L>
   basic_item(N&& n, M&& m, L&& l)
@@ -141,7 +141,8 @@ public:
       ptr{new_item(name_model::get_name(),
                    name_model::get_desc()),
           &free_item}
-  { if (!ptr) throw curses_error{"Item construction failed"}; }
+  { if (!ptr) throw curses_error{"Item construction failed"};
+    ptr->userptr = static_cast<void*>(this); }
 
   void set_selectable(bool);
   bool get_selectable() const noexcept;
@@ -194,6 +195,9 @@ public:
   const entries_type& get_entries() const noexcept { return entries; }
   void set_entries(std::list<item_type> e) noexcept
     { pointers_valid = false; entries = std::move(e); }
+
+        item_type* get_current();
+  const item_type* get_current() const;
 
         MENU* get_ptr()       noexcept { return men.get(); }
   const MENU* get_ptr() const noexcept { return men.get(); }
