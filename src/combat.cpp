@@ -30,8 +30,8 @@ add_char_to_turn(std::vector<combat::ini>& data, character& ch)
 void
 combat::add_character(character ch)
 {
-  chars.push_back(std::move(ch));
-  add_char_to_turn(turn, chars.back());
+  auto ret = chars.insert(std::make_pair(ch.get_identifier(), std::move(ch)));
+  add_char_to_turn(turn, ret.first->second);
   sort_by_ini(turn.begin(), turn.end());
 }
 
@@ -46,7 +46,7 @@ combat::get_full_turn()
 {
   std::vector<ini> result;
   for (auto& ch : chars)
-    add_char_to_turn(result, ch);
+    add_char_to_turn(result, ch.second);
 
   sort_by_ini(result.begin(), result.end());
   return result;

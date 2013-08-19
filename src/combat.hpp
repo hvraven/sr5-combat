@@ -2,13 +2,13 @@
 #define SHADOWRUN5_COMBAT_COMBAT_HPP
 
 #include "character.hpp"
-#include <list>
+#include <map>
 #include <utility>
 #include <vector>
 
 class combat
 {
-  using chars_type = std::list<character>;
+  using chars_type = std::map<std::string, character>;
 public:
   struct ini
   {
