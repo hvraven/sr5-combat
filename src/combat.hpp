@@ -8,7 +8,7 @@
 
 class combat
 {
-  using chars_type = std::map<std::string, character>;
+  using chars_type = std::map<character::identifier, character>;
 public:
   struct ini
   {
@@ -18,6 +18,7 @@ public:
   };
 
   void add_character(character);
+  bool del_character(character::identifier);
         chars_type& get_characters()       noexcept { return chars; }
   const chars_type& get_characters() const noexcept { return chars; }
 
@@ -28,10 +29,14 @@ public:
   const std::vector<ini>& get_remaining_turn() const noexcept
     { return turn; }
 
+  void adjust_ini(character::identifier, int);
+
+  void next()
+    { if (!turn.empty()) turn.erase(begin(turn)); }
+
 private:
   chars_type chars;
   std::vector<ini> turn;
-
 };
 
 #endif // SHADOWRUN5_COMBAT_COMBAT_HPP

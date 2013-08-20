@@ -51,7 +51,7 @@ interface::interface()
   ncurses::keypad(true);
 
   win = title_window{LINES - 2,0,0,0,"Testmenü"};
-  mvprintw(LINES - 1, 0, "[A]dd");
+  mvprintw(LINES - 2, 0, "[A]dd   [I]nterrupt  [N]ext");
   win.keypad(true);
 
   m.set_menu_mark(" ");
@@ -75,6 +75,13 @@ interface::run()
         {
         case 'a':
           add_char();
+          break;
+        case 'i':
+          handle_interrupt();
+          break;
+        case 'n':
+          data.next();
+          update_entries();
           break;
         case KEY_DOWN:
           m.move_cursor(REQ_DOWN_ITEM);
@@ -156,4 +163,18 @@ interface::update_entries()
     }
   m.set_entries(std::move(next));
   m.refresh();
+}
+
+void
+interface::handle_interrupt()
+{
+  auto s = ask_user("Initiative change: ");
+  if (s.empty())
+    return;
+
+  auto current = m.get_current();
+  if (current == nullptr)
+    return;
+  data.adjust_ini(current->data.ch->get_identifier(), std::stoi(s));
+  update_entries();
 }
