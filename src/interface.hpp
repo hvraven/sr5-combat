@@ -15,7 +15,7 @@ public:
 
   template <class T>
   using character_data_model = owning_data_model<combat::ini, T>;
-  using character_item = basic_item<str_fun_name_model, character_data_model>;
+  using character_item = item<str_fun_name_model, character_data_model>;
   using item_type = character_item;
   using menu_type = basic_menu<item_type>;
 

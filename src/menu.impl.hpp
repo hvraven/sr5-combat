@@ -1,24 +1,8 @@
 #include <algorithm>
 #include <numeric>
 
-template <template <class Base> class D,
-          template <class Base> class N>
-inline
-void
-basic_item<D, N>::set_selectable(bool b)
-{
-  check_for_menu_error(
-    set_item_opts(ptr.get(), b ? O_SELECTABLE : 0));
-}
-
-template <template <class Base> class D,
-          template <class Base> class N>
-inline
-bool
-basic_item<D, N>::get_selectable() const noexcept
-{
-  return item_opts(ptr.get()) & O_SELECTABLE;
-}
+#include "error.hpp"
+#include "window.hpp"
 
 template<class T>
 basic_menu<T>::basic_menu()
@@ -182,7 +166,7 @@ basic_menu<T>::update_entries()
   decltype(entries_p) nentries_p;
   nentries_p.reserve(entries.size() + 1);
   std::transform(begin(entries), end(entries), std::back_inserter(nentries_p),
-    [](item_type& c) { return c.ptr.get(); });
+    [](item_type& c) { return c.get(); });
   nentries_p.push_back(nullptr);
   std::swap(nentries_p, entries_p);
   check_for_menu_error(set_menu_items(men.get(), entries_p.data()));
