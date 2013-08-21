@@ -39,7 +39,7 @@ $(BUILDDIR)/.ghost:
 	touch $(BUILDDIR)/.ghost
 
 $(BUILD_TARGETS): % : %.o $(OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $^
+	$(LINK.cpp) -o $@ $^
 
 %.P: %.o
 
