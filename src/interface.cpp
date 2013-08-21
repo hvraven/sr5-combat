@@ -35,6 +35,13 @@ show_error(const char* error)
 {
   mvprintw(LINES - 1, 0, error);
   clrtoeol();
+  refresh();
+}
+
+void
+show_error(const std::string& error)
+{
+  show_error(error.data());
 }
 
 } // anonymous namespace
@@ -133,8 +140,6 @@ interface::add_char()
       if (!c.initiative.set_initiative(ini))
         {
           show_error("Invalid initiative value!");
-          pos_menu_cursor(m.get_ptr());
-          refresh();
           return;
         }
       data.add_character(std::move(c));
@@ -172,9 +177,31 @@ interface::handle_interrupt()
   if (s.empty())
     return;
 
+  int change;
+  try
+    {
+      size_t pos;
+      change = std::stoi(s, &pos);
+      if (pos != s.size())
+        {
+          show_error(s + " is not a valid number");
+          return;
+        }
+    }
+  catch (const std::invalid_argument& e)
+    {
+      show_error(s + " is not a valid number.");
+      return;
+    }
+  catch (const std::out_of_range& e)
+    {
+      show_error(s + " is too big.");
+      return;
+    }
+
   auto current = m.get_current();
   if (current == nullptr)
     return;
-  data.adjust_ini(current->data.ch->get_identifier(), std::stoi(s));
+  data.adjust_ini(current->data.ch->get_identifier(), change);
   update_entries();
 }
