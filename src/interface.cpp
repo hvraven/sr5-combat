@@ -87,8 +87,7 @@ interface::run()
           handle_interrupt();
           break;
         case 'n':
-          data.next();
-          update_entries();
+          handle_next();
           break;
         case KEY_DOWN:
           m.move_cursor(REQ_DOWN_ITEM);
@@ -203,5 +202,14 @@ interface::handle_interrupt()
   if (current == nullptr)
     return;
   data.adjust_ini(current->data.ch->get_identifier(), change);
+  update_entries();
+}
+
+void
+interface::handle_next()
+{
+  data.next();
+  if (data.get_remaining_turn().empty())
+    data.start_new_turn();
   update_entries();
 }

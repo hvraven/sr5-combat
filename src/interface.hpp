@@ -27,6 +27,7 @@ private:
   void add_char();
   void update_entries();
   void handle_interrupt();
+  void handle_next();
 };
 
 #endif // SHADOWRUN5_COMBAT_INTERFACE_HPP
