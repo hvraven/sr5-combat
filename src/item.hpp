@@ -109,8 +109,7 @@ public:
 protected:
   basic_item(ITEM* p)
     : ptr{p, &free_item}
-  { if (!ptr) throw curses_error{"Item construction failed"};
-    ptr->userptr = static_cast<void*>(this); }
+  { if (!ptr) throw curses_error{"Item construction failed"}; }
 
   using item_ptr = std::unique_ptr<ITEM, decltype(&free_item)>;
   item_ptr ptr;
@@ -136,7 +135,7 @@ public:
       name_model{},
       basic_item{new_item(name_model::get_name(),
                           name_model::get_desc())}
-  {}
+  {  ptr->userptr = static_cast<void*>(this); }
 
   template <class N, class M>
   item(N&& n, M&& m)
@@ -144,7 +143,7 @@ public:
       name_model{std::forward<N>(n), std::forward<M>(m)},
       basic_item{new_item(name_model::get_name(),
                           name_model::get_desc())}
-  {}
+  {  ptr->userptr = static_cast<void*>(this); }
 
   template <class N, class M, class L>
   item(N&& n, M&& m, L&& l)
@@ -152,7 +151,7 @@ public:
       name_model{std::forward<N>(n), std::forward<M>(m)},
       basic_item{new_item(name_model::get_name(),
                           name_model::get_desc())}
-  {}
+  {  ptr->userptr = static_cast<void*>(this); }
 };
 
 using default_item = item<owning_name_model, no_data_model>;
