@@ -34,6 +34,8 @@ public:
   void next()
     { if (!turn.empty()) turn.erase(begin(turn)); }
 
+  bool empty() const noexcept { return chars.empty(); }
+
 private:
   chars_type chars;
   std::vector<ini> turn;

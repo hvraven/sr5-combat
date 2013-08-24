@@ -172,6 +172,10 @@ interface::update_entries()
 void
 interface::handle_interrupt()
 {
+  auto current = m.get_current();
+  if (current == nullptr)
+    return;
+
   auto s = ask_user("Initiative change: ");
   if (s.empty())
     return;
@@ -198,9 +202,6 @@ interface::handle_interrupt()
       return;
     }
 
-  auto current = m.get_current();
-  if (current == nullptr)
-    return;
   data.adjust_ini(current->data.ch->get_identifier(), change);
   update_entries();
 }
@@ -208,6 +209,9 @@ interface::handle_interrupt()
 void
 interface::handle_next()
 {
+  if (data.empty())
+    return;
+
   data.next();
   if (data.get_remaining_turn().empty())
     data.start_new_turn();
