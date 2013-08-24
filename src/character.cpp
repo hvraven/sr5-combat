@@ -1,6 +1,7 @@
 #include "character.hpp"
 
 #include <limits>
+#include <stdexcept>
 
 namespace
 {
