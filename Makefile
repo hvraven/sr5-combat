@@ -9,8 +9,8 @@ PKGCONFIG_LDFLAGS   = $(shell pkg-config --libs $(PKGCONFIG_LIBRARIES))
 
 # Compiler Options
 CXXFLAGS       = -Wall -Wextra -ggdb
-CPPFLAGS       = -std=c++11 -I$(SRCDIR) $(PKGCONFIG_CPPFLAGS) -stdlib=libc++
-LDFLAGS        = $(PKGCONFIG_LDFLAGS) -stdlib=libc++
+CPPFLAGS       = -std=c++11 -stdlib=libc++ -I$(SRCDIR) $(PKGCONFIG_CPPFLAGS)
+LDFLAGS        = -stdlib=libc++ $(PKGCONFIG_LDFLAGS)
 
 df             = $(BUILDDIR)/$(*F)
 MAKEDEPEND     = $(CXX) -MM $(CPPFLAGS) $<
@@ -24,8 +24,9 @@ TARGETSRCS     = $(shell egrep -l '^(int )?main' $(SRCDIR)/*.cpp | sort)
 TARGETS        = $(patsubst $(SRCDIR)/%.cpp, %, $(TARGETSRCS))
 BUILD_TARGETS  = $(patsubst %,$(BUILDDIR)/%, $(TARGETS))
 
-.DEFAULT_GOAL: all
-all: $(TARGETS)
+all: sr5combat
+
+test: $(TARGETS)
 
 $(TARGETS): %: $(BUILDDIR)/%
 	cp $^ $@
