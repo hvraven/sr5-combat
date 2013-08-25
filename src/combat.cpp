@@ -73,7 +73,8 @@ combat::adjust_ini(character::identifier ident, int mod)
       t.ini += mod;
 
   turn.erase(
-    std::remove_if(begin(turn), end(turn), [](const ini& i){ return i.ini <= 0; }),
+    std::remove_if(begin(turn), end(turn),
+                   [](const ini& i){ return i.ini <= 0; }),
     end(turn));
 
   sort_by_ini(begin(turn), end(turn));
